@@ -1,4 +1,3 @@
-
 def composite_identity(f, g):
     """
     Return a function with one parameter x that returns True if f(g(x)) is
@@ -15,6 +14,14 @@ def composite_identity(f, g):
     """
     "*** YOUR CODE HERE ***"
 
+    def check(x):
+        if f(g(x)) == g(f(x)):
+            return True
+        else:
+            return False
+
+    return check
+
 
 def sum_digits(y):
     """Return the sum of the digits of non-negative integer y."""
@@ -22,6 +29,7 @@ def sum_digits(y):
     while y > 0:
         total, y = total + y % 10, y // 10
     return total
+
 
 def is_prime(n):
     """Return whether positive integer n is prime."""
@@ -33,6 +41,7 @@ def is_prime(n):
             return False
         k += 1
     return True
+
 
 def count_cond(condition):
     """Returns a function with one parameter N that counts all the numbers from
@@ -61,6 +70,23 @@ def count_cond(condition):
     """
     "*** YOUR CODE HERE ***"
 
+    """Returns a function with one parameter N that counts all the numbers from
+    1 to N that satisfy the two-argument predicate function Condition, where
+    the first argument for Condition is N and the second argument is the
+    number from 1 to N.
+    """
+
+    def count(n):
+        i = 1
+        ans = 0
+        while i <= n:
+            if condition(n, i):
+                ans += 1
+            i += 1
+        return ans
+
+    return count
+
 
 def multiple(a, b):
     """Return the smallest number n that is a multiple of both a and b.
@@ -71,7 +97,11 @@ def multiple(a, b):
     42
     """
     "*** YOUR CODE HERE ***"
-
+    n = 1
+    while True:
+        if n % a == 0 and n % b == 0:
+            return n
+        n += 1
 
 
 def cycle(f1, f2, f3):
@@ -102,3 +132,19 @@ def cycle(f1, f2, f3):
     """
     "*** YOUR CODE HERE ***"
 
+    def g(n):
+        def h(x):
+            i = 0
+            while i < n:
+                if i % 3 == 0:
+                    x = f1(x)
+                elif i % 3 == 1:
+                    x = f2(x)
+                else:
+                    x = f3(x)
+                i += 1
+            return x
+
+        return h
+
+    return g

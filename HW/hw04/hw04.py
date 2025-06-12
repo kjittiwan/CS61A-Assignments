@@ -11,8 +11,16 @@ def shuffle(s):
     >>> letters  # Original list should not be modified
     ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
     """
-    assert len(s) % 2 == 0, 'len(seq) must be even'
+    assert len(s) % 2 == 0, "len(seq) must be even"
     "*** YOUR CODE HERE ***"
+    # # divide into two halves
+    half = len(s) // 2
+    first = s[:half]
+    last = s[half:]
+    ans = []
+    for i in range(half):
+        ans = ans + [first[i]] + [last[i]]
+    return ans
 
 
 def deep_map(f, s):
@@ -38,33 +46,43 @@ def deep_map(f, s):
     True
     """
     "*** YOUR CODE HERE ***"
+    # loop over s
+    # for each index, if is number, modify in place, else apply  deepmap to it?
+    for i in range(len(s)):
+        if type(s[i]) == list:
+            deep_map(f, s[i])
+        else:
+            s[i] = f(s[i])
 
 
-HW_SOURCE_FILE=__file__
+HW_SOURCE_FILE = __file__
 
 
 def planet(mass):
     """Construct a planet of some mass."""
     assert mass > 0
     "*** YOUR CODE HERE ***"
+    return ["planet", mass]
+
 
 def mass(p):
     """Select the mass of a planet."""
-    assert is_planet(p), 'must call mass on a planet'
+    assert is_planet(p), "must call mass on a planet"
     "*** YOUR CODE HERE ***"
+    return p[1]
+
 
 def is_planet(p):
     """Whether p is a planet."""
-    return type(p) == list and len(p) == 2 and p[0] == 'planet'
+    return type(p) == list and len(p) == 2 and p[0] == "planet"
+
 
 def examples():
-    t = mobile(arm(1, planet(2)),
-               arm(2, planet(1)))
-    u = mobile(arm(5, planet(1)),
-               arm(1, mobile(arm(2, planet(3)),
-                             arm(3, planet(2)))))
+    t = mobile(arm(1, planet(2)), arm(2, planet(1)))
+    u = mobile(arm(5, planet(1)), arm(1, mobile(arm(2, planet(3)), arm(3, planet(2)))))
     v = mobile(arm(4, t), arm(2, u))
     return t, u, v
+
 
 def total_mass(m):
     """Return the total mass of m, a planet or mobile.
@@ -82,6 +100,7 @@ def total_mass(m):
     else:
         assert is_mobile(m), "must get total mass of a mobile or a planet"
         return total_mass(end(left(m))) + total_mass(end(right(m)))
+
 
 def balanced(m):
     """Return whether m is balanced.
@@ -105,9 +124,25 @@ def balanced(m):
     """
     "*** YOUR CODE HERE ***"
 
+    # calculate torque of arm
+    def torque(s):
+        return length(s) * total_mass(end(s))
+
+    def submobiles_balanced(s):
+        if is_mobile(end(s)):
+            return balanced(end(s))
+        else:
+            return True
+
+    return (
+        torque(left(m)) == torque(right(m))
+        and submobiles_balanced(left(m))
+        and submobiles_balanced(right(m))
+    )
+
 
 def berry_finder(t):
-    """Returns True if t contains a node with the value 'berry' and 
+    """Returns True if t contains a node with the value 'berry' and
     False otherwise.
 
     >>> scrat = tree('berry')
@@ -124,9 +159,16 @@ def berry_finder(t):
     True
     """
     "*** YOUR CODE HERE ***"
+    if label(t) == "berry":
+        return True
+    else:
+        for b in branches(t):
+            if berry_finder(b):
+                return True
+        return False
 
 
-HW_SOURCE_FILE=__file__
+HW_SOURCE_FILE = __file__
 
 
 def max_path_sum(t):
@@ -139,41 +181,57 @@ def max_path_sum(t):
     17
     """
     "*** YOUR CODE HERE ***"
+    # if leaf return label
+    # otherwise return label + recursive call
+    highest_sum = 0
+    if is_leaf(t):
+        return label(t)
+    else:
+        for b in branches(t):
+            highest_sum = max(highest_sum, max_path_sum(b))
+        return label(t) + highest_sum
 
 
 def mobile(left, right):
     """Construct a mobile from a left arm and a right arm."""
     assert is_arm(left), "left must be an arm"
     assert is_arm(right), "right must be an arm"
-    return ['mobile', left, right]
+    return ["mobile", left, right]
+
 
 def is_mobile(m):
     """Return whether m is a mobile."""
-    return type(m) == list and len(m) == 3 and m[0] == 'mobile'
+    return type(m) == list and len(m) == 3 and m[0] == "mobile"
+
 
 def left(m):
     """Select the left arm of a mobile."""
     assert is_mobile(m), "must call left on a mobile"
     return m[1]
 
+
 def right(m):
     """Select the right arm of a mobile."""
     assert is_mobile(m), "must call right on a mobile"
     return m[2]
 
+
 def arm(length, mobile_or_planet):
     """Construct an arm: a length of rod with a mobile or planet at the end."""
     assert is_mobile(mobile_or_planet) or is_planet(mobile_or_planet)
-    return ['arm', length, mobile_or_planet]
+    return ["arm", length, mobile_or_planet]
+
 
 def is_arm(s):
     """Return whether s is an arm."""
-    return type(s) == list and len(s) == 3 and s[0] == 'arm'
+    return type(s) == list and len(s) == 3 and s[0] == "arm"
+
 
 def length(s):
     """Select the length of an arm."""
     assert is_arm(s), "must call length on an arm"
     return s[1]
+
 
 def end(s):
     """Select the mobile or planet hanging at the end of an arm."""
@@ -181,22 +239,25 @@ def end(s):
     return s[2]
 
 
-
 # Tree Data Abstraction
+
 
 def tree(label, branches=[]):
     """Construct a tree with the given label value and a list of branches."""
     for branch in branches:
-        assert is_tree(branch), 'branches must be trees'
+        assert is_tree(branch), "branches must be trees"
     return [label] + list(branches)
+
 
 def label(tree):
     """Return the label value of a tree."""
     return tree[0]
 
+
 def branches(tree):
     """Return the list of branches of the given tree."""
     return tree[1:]
+
 
 def is_tree(tree):
     """Returns True if the given tree is a tree, and False otherwise."""
@@ -207,11 +268,13 @@ def is_tree(tree):
             return False
     return True
 
+
 def is_leaf(tree):
     """Returns True if the given tree's list of branches is empty, and False
     otherwise.
     """
     return not branches(tree)
+
 
 def print_tree(t, indent=0):
     """Print a representation of this tree in which each node is
@@ -232,9 +295,10 @@ def print_tree(t, indent=0):
       6
         7
     """
-    print('  ' * indent + str(label(t)))
+    print("  " * indent + str(label(t)))
     for b in branches(t):
         print_tree(b, indent + 1)
+
 
 def copy_tree(t):
     """Returns a copy of t. Only for testing purposes.
@@ -246,4 +310,3 @@ def copy_tree(t):
     5
     """
     return tree(label(t), [copy_tree(b) for b in branches(t)])
-
